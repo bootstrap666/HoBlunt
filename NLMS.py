@@ -27,7 +27,7 @@ class NLMS_Algorithm:
         pass   
         
     def get_adaptation_interval(self):
-        return 42
+        return 67
 
     def get_time_coefficients(self):
         return self.w

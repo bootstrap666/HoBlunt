@@ -161,21 +161,17 @@ class ARGenerator(SignalGenerator):
     
         for k in range(1, p + 1):
     
-            b[k - 1] = -self.process_variance * self.denominator[k - 1]
+            A[k - 1, k - 1] = 1.0
     
-            for i in range(1, p + 1):
+            for j in range(1, p + 1):
     
-                value = 0.0
+                coefficient = self.denominator[j - 1]
+                lag = abs(k - j)
     
-                if k == i:
-                    value += 1.0
-    
-                lag = abs(k - i)
-    
-                if lag != 0:
-                    value += self.denominator[lag - 1]
-    
-                A[k - 1, i - 1] = value
+                if lag == 0:
+                    b[k - 1] -= coefficient * self.process_variance
+                else:
+                    A[k - 1, lag - 1] += coefficient
     
         r = np.empty(p + 1, dtype=np.float64)
     
