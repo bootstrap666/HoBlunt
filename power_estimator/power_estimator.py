@@ -19,8 +19,14 @@ class Power_Estimator:
     def read_estimate(self):
         return self._memory
 
-    def update_alpha(self,alpha):
-        self.alpha = alpha  
+    def update_alpha(self, alpha):
+        if not np.isscalar(alpha) or not isinstance(alpha, (int, float, np.number)):
+            raise TypeError("alpha must be a numeric scalar")
+
+        if not 0.0 < alpha < 1.0:
+            raise ValueError("alpha must be between 0 and 1")
+
+        self.alpha = alpha
         
     def reset(self):
         self._memory = self.initial_value
