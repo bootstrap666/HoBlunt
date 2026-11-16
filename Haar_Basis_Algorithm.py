@@ -26,11 +26,11 @@ class Haar_Basis_Algorithm:
 
         self.step_size = 1.0/len(self.active_basis)
         
-        self.mse_power_estimator = Power_Estimator(self.step_size)
+        self.mse_power_estimator = Power_Estimator(alpha=self.step_size, initial_value=10.0)
 
         # level indexed dictionary of power estimators 
         self.power_estimators = {
-            level: Power_Estimator(alpha)
+            level: Power_Estimator(alpha=alpha, initial_value=1)
             for level in range(self.Haar_matrix.max_level + 1)
         }
         

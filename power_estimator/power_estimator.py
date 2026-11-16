@@ -1,7 +1,7 @@
 import numpy as np
 
 class Power_Estimator:
-    def __init__(self, alpha):
+    def __init__(self, alpha, initial_value=1.0):
 
         if not np.isscalar(alpha) or not isinstance(alpha, (int, float, np.number)):
             raise TypeError("alpha must be a numeric scalar")
@@ -10,6 +10,7 @@ class Power_Estimator:
             raise ValueError("alpha must be between 0 and 1")
         
         self.alpha = alpha
+        self.initial_value = initial_value
         self.reset()
 
     def update(self, new_sample):
@@ -22,4 +23,4 @@ class Power_Estimator:
         self.alpha = alpha  
         
     def reset(self):
-        self._memory = 1.0
+        self._memory = self.initial_value
