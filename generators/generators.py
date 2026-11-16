@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from pathlib import Path
 from .regression_vector import RegressionVector
+import librosa
 
 class SignalGenerator(ABC):
 
