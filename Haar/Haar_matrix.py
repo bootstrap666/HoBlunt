@@ -38,8 +38,8 @@ class Haar_matrix:
         return basis_vector
     
     def get_basis_vector(self, k):
-        if not isinstance(max_level, (int, np.integer)) or isinstance(max_level, bool):
-            raise TypeError("max_level must be an integer")
+        if not isinstance(k, (int, np.integer)) or isinstance(k, bool):
+            raise TypeError("k must be an integer")
         
         if not 0 <= k < 2**self.max_level:
             raise IndexError(
