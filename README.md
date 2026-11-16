@@ -23,7 +23,7 @@ The repository also contains an NLMS reference algorithm, stochastic signal gene
 
 ## Haar transform conventions
 
-For a filter length (N=2^M), construct the matrix with:
+For a filter length $N=2^M$, construct the matrix with:
 
 ```python
 from Haar.Haar_matrix import Haar_matrix
@@ -33,7 +33,7 @@ haar = Haar_matrix(max_level=M)
 
 **Basis vectors are stored in columns** of `transform_matrix`:
 
-- `haar.transform_matrix[:, k]` is basis vector (k).
+- `haar.transform_matrix[:, k]` is basis vector $k$.
 - Transform to the Haar domain: `z = haar.transform_matrix.T @ x`.
 - Transform coefficients back to the time domain: `w = haar.transform_matrix @ b`.
 
@@ -41,18 +41,18 @@ The coefficient indices are grouped into levels:
 
 | Level | Global coefficient indices |
 |---|---|
-| (S_0) | `0` |
-| (S_i), (i \geq 1) | `2**(i-1)` through `2**i - 1` |
+| $S_0$ | `0` |
+| $S_i$, $i \geq 1$ | `2**(i-1)` through `2**i - 1` |
 
-Thus, (S_0) contains one scaling vector and each subsequent level contains the Haar wavelets at one scale. For an (N=2^M) transform, the complete index range is (0,ldots,N-1).
+Thus, $S_0$ contains one scaling vector and each subsequent level contains the Haar wavelets at one scale. For an $N=2^M$ transform, the complete index range is $0,\ldots,N-1$.
 
 Tree methods accept and return **global coefficient indices**:
 
 - `find_indexes_level(level)`: indices belonging to a level.
 - `find_first_index_in_level(level)`: first index of a level.
-- `get_level(k)`: level containing coefficient (k).
-- `parents_of(k)`: Parent coefficient indices of (k).
-- `children_of(k)`: Children coefficient indices of (k).
+- `get_level(k)`: level containing coefficient $k$.
+- `parents_of(k)`: Parent coefficient indices of $k$.
+- `children_of(k)`: Children coefficient indices of $k$.
 
 The Parent/Children relations are the temporal-hierarchy relations used by the Haar–Basis algorithm. They are not a general wavelet-packet tree interface.
 
@@ -77,16 +77,16 @@ Haar_Basis_Algorithm(
 | Argument | Meaning |
 |---|---|
 | `Haar_matrix` | An initialized `Haar_matrix` instance. |
-| `filter_length` | Time-domain filter length (N); the implementation requires a power of two. |
+| `filter_length` | Time-domain filter length $N$; the implementation requires a power of two. |
 | `control_level` | Haar level whose coefficients are tested for nonzero significance. |
 | `alpha` | Smoothing factor for the input-power estimators, one per Haar level. |
 | `G` | Positive factor used to determine the Adaptation Interval. |
 | `beta_fa` | Multiplier used in the Control-coefficient detection threshold. |
-| `mu` | Base adaptation factor. After initialization/reset and each adaptation event, the step size is (mu/|\mathcal A|). |
+| `mu` | Base adaptation factor. After initialization/reset and each adaptation event, the step size is $\mu/\lvert\mathcal{A}\rvert$. |
 | `force_initial_selection` | Enables the first-interval fallback: when no Control coefficient is detected, the three largest-magnitude Control coefficients are used to expand the active set. |
 | `zero_inactive_coefficients` | When enabled, coefficients removed from the active set are set to zero. Defaults to `True`. |
 
-Here, (\mathcal A) denotes the active coefficient-index set. The algorithm starts with the scaling/low-level coefficients and all Control coefficients at the selected level. At an Adaptation Interval boundary, `AI()` rebuilds the active set from the Control detections, adding the corresponding Parent and Children coefficients.
+Here, $\mathcal{A}$ denotes the active coefficient-index set. The algorithm starts with the scaling/low-level coefficients and all Control coefficients at the selected level. At an Adaptation Interval boundary, `AI()` rebuilds the active set from the Control detections, adding the corresponding Parent and Children coefficients.
 
 ### Inactive-coefficient policy
 
@@ -190,7 +190,7 @@ The returned dictionary is keyed by algorithm name. Each algorithm has three arr
 | Metric | Value stored at each sample |
 |---|---|
 | `MSD` | Squared Euclidean norm of the difference between the estimated and true time-domain coefficient vectors. |
-| `MSE` | Instantaneous squared error (e^2[n]). |
+| `MSE` | Instantaneous squared error $e^2[n]$. |
 | `NPEA` | Number of effectively adapted coefficients reported by the algorithm. |
 
 The runner returns MSD and MSE in **linear scale**. The experiment notebook plots them in decibels using (10\log_{10}(\cdot)). Monte Carlo routines average each metric sample-by-sample over the requested realizations.
