@@ -113,10 +113,8 @@ class Haar_matrix:
                 f"level must be between 0 and {self.max_level}, got {level}"
             )
     
-        return list(range(
-            self.find_first_index_in_level(level),
-            self.find_first_index_in_level(level + 1)
-        ))
+        first_index = self.find_first_index_in_level(level)
+        return list(range(first_index, 2**level))
 
     def get_level(self, k):
         return int(np.ceil(np.log2(k + 1)))
