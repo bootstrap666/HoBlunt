@@ -3,6 +3,16 @@ from concurrent.futures import ProcessPoolExecutor
 import copy
 import os
 
+def _validate_adaptation_interval(interval):
+    if (
+        isinstance(interval, (bool, np.bool_))
+        or not isinstance(interval, (int, np.integer))
+        or interval <= 0
+    ):
+        raise ValueError("O intervalo de adaptação deve ser um inteiro positivo.")
+    return interval
+
+
 def run_realization(
     signal_generator,
     noise_generator,
@@ -33,9 +43,7 @@ def run_realization(
     adaptation_intervals = {}
 
     for name, algorithm in algorithms.items():
-        interval = algorithm.get_adaptation_interval()
-        if not isinstance(interval, (int, np.integer)):
-            raise ValueError("O intervalo de adaptação deve ser inteiro.")
+        interval = _validate_adaptation_interval(algorithm.get_adaptation_interval())
         adaptation_intervals[name] = interval
 
     for n in range(n_samples):
@@ -60,9 +68,7 @@ def run_realization(
                 algorithm.AI()
                 adaptation_counters[name] = 0
 
-                interval = algorithm.get_adaptation_interval()
-                if not isinstance(interval, (int, np.integer)):
-                    raise ValueError("O intervalo de adaptação deve ser inteiro.")
+                interval = _validate_adaptation_interval(algorithm.get_adaptation_interval())
                 adaptation_intervals[name] = interval
 
     return results
