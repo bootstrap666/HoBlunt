@@ -48,8 +48,8 @@ Thus, $S_0$ contains one scaling vector and each subsequent level contains the H
 
 Tree methods accept and return **global coefficient indices**:
 
-- `find_indexes_level(level)`: indices belonging to a level.
-- `find_first_index_in_level(level)`: first index of a level.
+- `find_indexes_level(level)`: indices belonging to a level; valid for every level from `0` through `max_level`, inclusive.
+- `find_first_index_in_level(level)`: first index of a level, with the same inclusive level range.
 - `get_level(k)`: level containing coefficient $k$.
 - `parents_of(k)`: Parent coefficient indices of $k$.
 - `children_of(k)`: Children coefficient indices of $k$.
@@ -82,7 +82,7 @@ Haar_Basis_Algorithm(
 | `alpha` | Smoothing factor for the input-power estimators, one per Haar level. |
 | `G` | Positive factor used to determine the Adaptation Interval. |
 | `beta_fa` | Multiplier used in the Control-coefficient detection threshold. |
-| `mu` | Base step-size factor. `reset()` and each call to `AI()` set `step_size = mu / len(active_basis)`. The constructor initially assigns `1 / len(active_basis)`; the experiment runner calls `reset()` before each realization. |
+| `mu` | Base step-size factor. The constructor, `reset()`, and each call to `AI()` set `step_size = mu / len(active_basis)`. |
 | `force_initial_selection` | Enables the first-interval fallback: when no Control coefficient is detected, the three largest-magnitude Control coefficients are used to expand the active set. |
 | `zero_inactive_coefficients` | When enabled, coefficients removed from the active set are set to zero. Defaults to `True`. |
 
@@ -139,7 +139,7 @@ $
 \widehat P[n]=(1-\alpha)\widehat P[n-1]+\alpha u^2[n]
 $
 
-Its constructor accepts `alpha` and `initial_value`. `reset()` restores the configured initial value; `update_alpha()` changes the smoothing factor without resetting the stored estimate.
+Its constructor accepts `alpha` and `initial_value`. Both the constructor and `update_alpha()` require a numeric scalar strictly between zero and one. `reset()` restores the configured initial value; `update_alpha()` changes the smoothing factor without resetting the stored estimate.
 
 ## Signal and noise generators
 
@@ -183,7 +183,7 @@ get_adaptation_interval()
 AI()
 ```
 
-Each algorithm has its own adaptation counter and current interval. The runner advances the counters once per input sample. When an interval expires, it calls that algorithm's `AI()` and then queries `get_adaptation_interval()` again. This permits the interval to change after an adaptation event without embedding algorithm-specific timing logic in the runner.
+Each algorithm has its own adaptation counter and current interval. Adaptation intervals must be strictly positive integers; the runner raises `ValueError` if an algorithm returns a zero, negative, or non-integer interval. The runner advances the counters once per input sample. When an interval expires, it calls that algorithm's `AI()` and then queries `get_adaptation_interval()` again, validating the new interval as well. This permits the interval to change after an adaptation event without embedding algorithm-specific timing logic in the runner.
 
 The returned dictionary is keyed by algorithm name. Each algorithm has three arrays, each of length `n_samples`:
 
@@ -220,5 +220,3 @@ The repository does not currently provide a pinned dependency file or package in
 - The current Haar matrix is a conventional critically sampled Haar/DWT basis. It is not a Wavelet Packet Transform implementation.
 - The notebook plots document particular experiment configurations; they are not performance guarantees.
 - The current implementation contains no CI workflow or automated test runner. The notebooks provide manual exploratory checks.
-- In `Haar/Haar_matrix.py`, `get_basis_vector()` currently references `max_level` without qualifying it as an instance attribute. Also, `find_indexes_level(max_level)` requests the first index of level `max_level + 1`, while `find_first_index_in_level()` rejects levels above `max_level`. These boundary/API issues should be fixed and covered by tests before relying on those methods at the deepest level.
-- `SpeechFileGenerator` calls `librosa.load()`, but `generators/generators.py` currently does not import `librosa`. The speech-file generator therefore requires that missing import to be addressed before use.
