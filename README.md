@@ -220,3 +220,5 @@ The repository does not currently provide a pinned dependency file or package in
 - The current Haar matrix is a conventional critically sampled Haar/DWT basis. It is not a Wavelet Packet Transform implementation.
 - The notebook plots document particular experiment configurations; they are not performance guarantees.
 - The current implementation contains no CI workflow or automated test runner. The notebooks provide manual exploratory checks.
+- In `Haar/Haar_matrix.py`, `get_basis_vector()` currently references `max_level` without qualifying it as an instance attribute. Also, `find_indexes_level(max_level)` requests the first index of level `max_level + 1`, while `find_first_index_in_level()` rejects levels above `max_level`. These boundary/API issues should be fixed and covered by tests before relying on those methods at the deepest level.
+- `SpeechFileGenerator` calls `librosa.load()`, but `generators/generators.py` currently does not import `librosa`. The speech-file generator therefore requires that missing import to be addressed before use.
