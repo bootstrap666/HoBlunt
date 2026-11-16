@@ -93,6 +93,13 @@ class Haar_Basis_Algorithm:
     
         self.step_size = self.mu / len(self.active_basis)
         self.mse_power_estimator.update_alpha(self.step_size)
+
+        #############################
+        #Zeroes inactive coefficients 
+        new_b = np.zeros_like(self.b)
+        active = list(self.active_basis)
+        new_b[active] = self.b[active]
+        self.b = new_b
         
     def get_adaptation_interval(self):
         return int(self.G/(4*self.step_size))
