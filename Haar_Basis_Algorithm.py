@@ -3,7 +3,7 @@ from np_detector.np_detector import np_detector
 from power_estimator.power_estimator import Power_Estimator
 
 class Haar_Basis_Algorithm:
-    def __init__(self, Haar_matrix, filter_length, control_level, alpha, G, beta_fa, mu, force_initial_selection=False):
+    def __init__(self, Haar_matrix, filter_length, control_level, alpha, G, beta_fa, mu, force_initial_selection=False, zero_inactive_coefficients=True):
         
         self.x_regressor = np.zeros(filter_length)
         N = self.x_regressor.size
@@ -19,6 +19,7 @@ class Haar_Basis_Algorithm:
         self.beta_fa = beta_fa
         self.mu = mu
         self.force_initial_selection = force_initial_selection
+        self.zero_inactive_coefficients = zero_inactive_coefficients
 
         # initialize the active basis with V0, V1 and the control level
         self.active_basis = set([0, 1])
@@ -95,11 +96,12 @@ class Haar_Basis_Algorithm:
         self.mse_power_estimator.update_alpha(self.step_size)
 
         #############################
-        #Zeroes inactive coefficients 
-        new_b = np.zeros_like(self.b)
-        active = list(self.active_basis)
-        new_b[active] = self.b[active]
-        self.b = new_b
+        #Zeroes inactive coefficients
+        if self.zero_inactive_coefficients:
+            new_b = np.zeros_like(self.b)
+            active = list(self.active_basis)
+            new_b[active] = self.b[active]
+            self.b = new_b
         
     def get_adaptation_interval(self):
         return int(self.G/(4*self.step_size))
