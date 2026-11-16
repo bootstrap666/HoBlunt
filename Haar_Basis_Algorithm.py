@@ -25,7 +25,7 @@ class Haar_Basis_Algorithm:
         self.active_basis = set([0, 1])
         self.active_basis.update(Haar_matrix.find_indexes_level(control_level))
 
-        self.step_size = 1.0/len(self.active_basis)
+        self.step_size = self.mu/len(self.active_basis)
         
         self.mse_power_estimator = Power_Estimator(alpha=self.step_size, initial_value=10.0)
 
