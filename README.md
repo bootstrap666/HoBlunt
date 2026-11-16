@@ -211,7 +211,22 @@ The notebooks are exploratory research material, not an automated unit-test suit
 
 The notebooks add the repository root to `sys.path` based on the current working directory, and therefore expect to be launched from the `testing/` directory.
 
-The repository does not currently provide a pinned dependency file or package installer configuration. The source code requires NumPy. The notebooks additionally use Matplotlib and SciPy; the speech-file source uses a WAV-loading library. Install the required packages in the active Python environment before running the corresponding notebook or source path.
+Install the project dependencies from the repository root:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+The dependency file includes NumPy for the numerical code, librosa for WAV-file loading in `SpeechFileGenerator`, Matplotlib and SciPy for the experiment notebooks, and JupyterLab with the IPython kernel for running those notebooks.
+
+To launch the notebooks, start JupyterLab from the `testing/` directory:
+
+```bash
+cd testing
+jupyter lab
+```
+
+The dependency file lists package names without version pins. It is an installation manifest, not a fully locked environment; exact reproducibility across machines may require recording tested package versions separately.
 
 ## Research notes and scope
 
