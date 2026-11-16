@@ -1,0 +1,11 @@
+# Core numerical and signal-processing dependencies
+numpy
+librosa
+
+# Dependencies used by the experiment notebooks
+matplotlib
+scipy
+
+# Jupyter environment for running the notebooks
+ipykernel
+jupyterlab
