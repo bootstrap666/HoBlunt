@@ -82,7 +82,7 @@ Haar_Basis_Algorithm(
 | `alpha` | Smoothing factor for the input-power estimators, one per Haar level. |
 | `G` | Positive factor used to determine the Adaptation Interval. |
 | `beta_fa` | Multiplier used in the Control-coefficient detection threshold. |
-| `mu` | Base adaptation factor. After initialization/reset and each adaptation event, the step size is $\mu/\lvert\mathcal{A}\rvert$. |
+| `mu` | Base step-size factor. `reset()` and each call to `AI()` set `step_size = mu / len(active_basis)`. The constructor initially assigns `1 / len(active_basis)`; the experiment runner calls `reset()` before each realization. |
 | `force_initial_selection` | Enables the first-interval fallback: when no Control coefficient is detected, the three largest-magnitude Control coefficients are used to expand the active set. |
 | `zero_inactive_coefficients` | When enabled, coefficients removed from the active set are set to zero. Defaults to `True`. |
 
@@ -125,19 +125,19 @@ The algorithm exposes:
 
 The detector in `np_detector/np_detector.py` implements the threshold test:
 
-[
-T = \beta_{fa}\sqrt{\frac{\mu_{step}\,\widehat\xi}{\widehat\lambda_\Delta}},
-\qquad
-\text{detected} \iff |b_k| > T.
-]
+$
+T = \beta_{\mathrm{fa}}\sqrt{\frac{\mu_{\mathrm{step}}\,\widehat{\xi}}{\widehat{\lambda}_{\Delta}}}
+$
+
+A Control coefficient is detected when $|b_k| > T$.
 
 The arguments `mu`, `xi`, and `lambda_delta` passed to `np_detector()` are, respectively, the current step size, the current MSE estimate, and the input-power estimate for the Control level. The function returns a Boolean and does not modify algorithm state.
 
 `Power_Estimator` uses exponential averaging of squared samples:
 
-[
-\widehat P[n]=(1-\alpha)\widehat P[n-1]+\alpha u^2[n].
-]
+$
+\widehat P[n]=(1-\alpha)\widehat P[n-1]+\alpha u^2[n]
+$
 
 Its constructor accepts `alpha` and `initial_value`. `reset()` restores the configured initial value; `update_alpha()` changes the smoothing factor without resetting the stored estimate.
 
@@ -151,11 +151,11 @@ Its constructor accepts `alpha` and `initial_value`. `reset()` restores the conf
 
 Implemented classes:
 
-- `ARGenerator`: autoregressive Gaussian process driven by white Gaussian innovations. With denominator coefficients (a_i), the recurrence implemented is (x[n] = -\sum_i a_i x[n-i] + u[n]). `process_variance` specifies the desired stationary output variance; the innovation variance is computed from the Yule–Walker solution.
+- `ARGenerator`: autoregressive Gaussian process driven by white Gaussian innovations. With denominator coefficients $a_i$, the recurrence implemented is $x[n] = -\sum_i a_i x[n-i] + u[n]$. `process_variance` specifies the desired stationary output variance; the innovation variance is computed from the Yule–Walker solution.
 - `GaussianNoiseGenerator`: zero-mean white Gaussian noise.
 - `SpeechFileGenerator`: reads a WAV file and returns its samples sequentially, wrapping to the beginning when the end is reached. It also accepts an AR-coefficient file for the inherited initialization/statistics interface.
 
-`RegressionVector` stores the history as ([x[n],x[n-1],\ldots,x[n-N+1]]^T). A new sample is inserted at index zero.
+`RegressionVector` stores the history as $[x[n],x[n-1],\ldots,x[n-N+1]]^T$. A new sample is inserted at index zero.
 
 ## Echo-path models
 
@@ -193,7 +193,7 @@ The returned dictionary is keyed by algorithm name. Each algorithm has three arr
 | `MSE` | Instantaneous squared error $e^2[n]$. |
 | `NPEA` | Number of effectively adapted coefficients reported by the algorithm. |
 
-The runner returns MSD and MSE in **linear scale**. The experiment notebook plots them in decibels using (10\log_{10}(\cdot)). Monte Carlo routines average each metric sample-by-sample over the requested realizations.
+The runner returns MSD and MSE in **linear scale**. The experiment notebook plots them in decibels using $10\log_{10}(\cdot)$. Monte Carlo routines average each metric sample-by-sample over the requested realizations.
 
 ## Notebooks
 
