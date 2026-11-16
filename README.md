@@ -125,9 +125,9 @@ The algorithm exposes:
 
 The detector in `np_detector/np_detector.py` implements the threshold test:
 
-$
+$$
 T = \beta_{\mathrm{fa}}\sqrt{\frac{\mu_{\mathrm{step}}\,\widehat{\xi}}{\widehat{\lambda}_{\Delta}}}
-$
+$$
 
 A Control coefficient is detected when $|b_k| > T$.
 
@@ -135,9 +135,9 @@ The arguments `mu`, `xi`, and `lambda_delta` passed to `np_detector()` are, resp
 
 `Power_Estimator` uses exponential averaging of squared samples:
 
-$
+$$
 \widehat P[n]=(1-\alpha)\widehat P[n-1]+\alpha u^2[n]
-$
+$$
 
 Its constructor accepts `alpha` and `initial_value`. Both the constructor and `update_alpha()` require a numeric scalar strictly between zero and one. `reset()` restores the configured initial value; `update_alpha()` changes the smoothing factor without resetting the stored estimate.
 
