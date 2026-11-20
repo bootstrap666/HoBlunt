@@ -1,6 +1,7 @@
 # Core numerical and signal-processing dependencies
 numpy
 librosa
+PyWavelets
 
 # Dependencies used by the experiment notebooks
 matplotlib
