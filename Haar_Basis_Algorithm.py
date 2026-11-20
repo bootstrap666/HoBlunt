@@ -30,10 +30,11 @@ class Haar_Basis_Algorithm:
         self.mse_power_estimator = Power_Estimator(alpha=self.step_size, initial_value=10.0)
 
         # level indexed dictionary of power estimators 
-        self.power_estimators = {
-            level: Power_Estimator(alpha=alpha, initial_value=1)
-            for level in range(self.Haar_matrix.max_level + 1)
-        }
+        self.power_estimators = self._create_basis_power_estimators(alpha)
+        # self.power_estimators = {
+        #     level: Power_Estimator(alpha=alpha, initial_value=1)
+        #     for level in range(self.Haar_matrix.max_level + 1)
+        # }
         
     def step(self, new_input, new_desired_signal):
         self.x_regressor[1:] = self.x_regressor[:-1]
@@ -47,23 +48,25 @@ class Haar_Basis_Algorithm:
 
         self.mse_power_estimator.update(e)
 
-        for level, estimator in self.power_estimators.items():
-            first_index = self.Haar_matrix.find_first_index_in_level(level)
-            estimator.update(z[first_index])
+        self._update_basis_power(z)
+        # for level, estimator in self.power_estimators.items():
+        #     first_index = self.Haar_matrix.find_first_index_in_level(level)
+        #     estimator.update(z[first_index])
 
         for active in self.active_basis:
-            level = self.Haar_matrix.get_level(active)
-            power = self.power_estimators[level].read_estimate()
+            # level = self.Haar_matrix.get_level(active)
+            # power = self.power_estimators[level].read_estimate()
+            power =  self._get_basis_power(active)
             self.b[active] =  self.b[active] + 2*self.step_size*e*z[active]/power
             
         return e
-        
+    
     def AI(self):
         self.active_basis = set([0, 1])
         self.active_basis.update(self.control_basis)
     
-        level = self.control_level
-        power = self.power_estimators[level].read_estimate()
+        # level = self.control_level
+        # power = self.power_estimators[level].read_estimate()
         added = 0
     
         for control in self.control_basis:
@@ -72,7 +75,8 @@ class Haar_Basis_Algorithm:
                 self.beta_fa,
                 self.step_size,
                 self.mse_power_estimator.read_estimate(),
-                power
+                self._get_basis_power(control)
+                # power
             ):
                 self.active_basis.update(self.Haar_matrix.parents_of(control))
                 self.active_basis.update(self.Haar_matrix.children_of(control))
@@ -122,8 +126,9 @@ class Haar_Basis_Algorithm:
 
         self.step_size = self.mu/len(self.active_basis)
 
-        for level in range(self.Haar_matrix.max_level + 1):
-            self.power_estimators[level].reset()
+        self._reset_basis_power()
+        # for level in range(self.Haar_matrix.max_level + 1):
+        #     self.power_estimators[level].reset()
             
         self.mse_power_estimator.update_alpha(self.step_size)
 
@@ -132,3 +137,41 @@ class Haar_Basis_Algorithm:
 
     def get_npea(self):
         return len(self.active_basis)
+
+    def _update_basis_power(self, z):
+        for level, estimator in self.power_estimators.items():
+            first_index = self.Haar_matrix.find_first_index_in_level(level)
+            estimator.update(z[first_index])
+        
+    def _get_basis_power(self, k):
+        level = self.Haar_matrix.get_level(k)
+        return self.power_estimators[level].read_estimate()
+
+    def _reset_basis_power(self):
+        for level in range(self.Haar_matrix.max_level + 1):
+            self.power_estimators[level].reset()
+
+    def _create_basis_power_estimators(self, alpha):
+        return {
+            level: Power_Estimator(alpha=alpha, initial_value=1)
+            for level in range(self.Haar_matrix.max_level + 1)
+        }
+            
+# One power estimator per coefficient. Use with caution.
+class Haar_Basis_Algorithm_Modified(Haar_Basis_Algorithm):
+    def _update_basis_power(self, z):
+        for k in range(self.x_regressor.size):
+            self.power_estimators[k].update(z[k])
+    
+    def _get_basis_power(self, k):
+        return self.power_estimators[k].read_estimate()
+    
+    def _reset_basis_power(self):
+        for estimator in self.power_estimators.values():
+            estimator.reset()
+
+    def _create_basis_power_estimators(self, alpha):
+        return {
+            level: Power_Estimator(alpha=alpha, initial_value=1)
+            for level in range(self.x_regressor.size)
+        }
